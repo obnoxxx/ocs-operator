@@ -371,10 +371,12 @@ var _ = Describe("StorageClusterInitialization", func() {
 
 				By("Verifying StorageClass is reconciled")
 				storageClassExpectReconcile(false)
-				By("Verifying CephObjectStore is reconciled")
-				cephObjectStoreExpectReconcile(false)
-				By("Verifying CephObjectStoreUser is reconciled")
-				cephObjectStoreUserExpectReconcile(false)
+				if currentCloudPlatform != scController.PlatformAWS {
+					By("Verifying CephObjectStore is reconciled")
+					cephObjectStoreExpectReconcile(false)
+					By("Verifying CephObjectStoreUser is reconciled")
+					cephObjectStoreUserExpectReconcile(false)
+				}
 				By("Verifying CephBlockPool is reconciled")
 				cephBlockPoolExpectReconcile(false)
 				By("Verifying CephFilesystem is reconciled")
@@ -402,10 +404,12 @@ var _ = Describe("StorageClusterInitialization", func() {
 
 				By("Verifying StorageClass is reconciled")
 				storageClassExpectReconcile(true)
-				By("Verifying CephObjectStore is reconciled")
-				cephObjectStoreExpectReconcile(true)
-				By("Verifying CephObjectStoreUser is reconciled")
-				cephObjectStoreUserExpectReconcile(true)
+				if currentCloudPlatform != scController.PlatformAWS {
+					By("Verifying CephObjectStore is reconciled")
+					cephObjectStoreExpectReconcile(true)
+					By("Verifying CephObjectStoreUser is reconciled")
+					cephObjectStoreUserExpectReconcile(true)
+				}
 				// We can't delete the block pool because it disrupts noobaa
 				//By("Verifying CephBlockPool is reconciled")
 				//cephBlockPoolExpectReconcile(true)

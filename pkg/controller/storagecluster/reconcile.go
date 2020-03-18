@@ -627,6 +627,9 @@ func (r *ReconcileStorageCluster) ensureCephConfig(sc *ocsv1.StorageCluster, req
 // the desired state.
 func (r *ReconcileStorageCluster) ensureCephCluster(sc *ocsv1.StorageCluster, reqLogger logr.Logger) error {
 	for i, ds := range sc.Spec.StorageDeviceSets {
+		if ds.DataPVCTemplate.Spec.StorageClassName == nil || *ds.DataPVCTemplate.Spec.StorageClassName == "" {
+			return false, fmt.Errorf("no StorageClass specified")
+		}
 		throttle, err := r.throttleStorageDevices(*ds.DataPVCTemplate.Spec.StorageClassName)
 		if err != nil {
 			return fmt.Errorf("Failed to verify StorageClass provisioner. %+v", err)

@@ -531,6 +531,53 @@ func TestValidateStorageDevicSet(t *testing.T) {
 	assert.Contains(t, err.Error(), "no StorageClass specified")
 }
 
+func TestThrottleStorageDevices(t *testing.T) {
+	sds := &api.StorageDeviceSet{}
+	mockDeviceSets[0].DeepCopyInto(sds)
+
+	storageClassEBS := &storagev1.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "gp2",
+		},
+		Provisioner: string(EBS),
+		Parameters: map[string]string{
+			"type": "gp2",
+		},
+	}
+	storageClassLocal := &storagev1.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "local",
+		},
+		Provisioner: "kubernetes.io/no-provisioner",
+	}
+
+	reconciler := createFakeStorageClusterReconciler(t, storageClassEBS, storageClassLocal)
+
+	scName := "local"
+	sds.DataPVCTemplate.Spec.StorageClassName = &scName
+	throttle, err := reconciler.throttleStorageDevices(scName)
+	assert.NoError(t, err)
+	assert.Equal(t, false, throttle)
+
+	scName = "nonexistant"
+	sds.DataPVCTemplate.Spec.StorageClassName = &scName
+	throttle, err = reconciler.throttleStorageDevices(scName)
+	assert.Contains(t, err.Error(), "failed to retrieve")
+	assert.Equal(t, false, throttle)
+
+	scName = ""
+	sds.DataPVCTemplate.Spec.StorageClassName = &scName
+	throttle, err = reconciler.throttleStorageDevices(scName)
+	assert.Contains(t, err.Error(), "failed to retrieve")
+	assert.Equal(t, false, throttle)
+
+	sds.DataPVCTemplate.Spec.StorageClassName = nil
+	throttle, err = reconciler.throttleStorageDevices(scName)
+	assert.Contains(t, err.Error(), "failed to retrieve")
+	assert.Equal(t, false, throttle)
+}
+
+
 func TestStorageClusterInitConditions(t *testing.T) {
 	cc := &rookCephv1.CephCluster{}
 	mockCephCluster.DeepCopyInto(cc)

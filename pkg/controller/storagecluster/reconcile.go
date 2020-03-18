@@ -630,6 +630,9 @@ func (r *ReconcileStorageCluster) ensureCephCluster(sc *ocsv1.StorageCluster, re
 	// this is for performance optimization of slow device class
 	//TODO: If for a StorageDeviceSet there is a separate metadata pvc template, check for StorageClass of data pvc template only
 	for i, ds := range sc.Spec.StorageDeviceSets {
+		if ds.DataPVCTemplate.Spec.StorageClassName == nil || *ds.DataPVCTemplate.Spec.StorageClassName == "" {
+			return false, fmt.Errorf("no StorageClass specified")
+		}
 		throttle, err := r.throttleStorageDevices(*ds.DataPVCTemplate.Spec.StorageClassName)
 		if err != nil {
 			return fmt.Errorf("Failed to verify StorageClass provisioner. %+v", err)

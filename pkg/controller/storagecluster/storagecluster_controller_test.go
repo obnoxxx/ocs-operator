@@ -9,6 +9,7 @@ import (
 	rookCephv1 "github.com/rook/rook/pkg/apis/ceph.rook.io/v1"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
+	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -490,6 +491,46 @@ func TestStorageClassDeviceSetCreation(t *testing.T) {
 	}
 }
 
+func TestValidateStorageDevicSet(t *testing.T) {
+	sds := &api.StorageDeviceSet{}
+	mockDeviceSets[0].DeepCopyInto(sds)
+
+	storageClassEBS := &storagev1.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "gp2",
+		},
+		Provisioner: string(EBS),
+		Parameters: map[string]string{
+			"type": "gp2",
+		},
+	}
+	storageClassLocal := &storagev1.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "local",
+		},
+		Provisioner: "kubernetes.io/no-provisioner",
+	}
+
+	reconciler := createFakeStorageClusterReconciler(t, storageClassEBS, storageClassLocal)
+
+	err := reconciler.validateStorageDeviceSet(*sds)
+	assert.NoError(t, err)
+
+	scName := "local"
+	sds.DataPVCTemplate.Spec.StorageClassName = &scName
+	err = reconciler.validateStorageDeviceSet(*sds)
+	assert.NoError(t, err)
+
+	scName = ""
+	sds.DataPVCTemplate.Spec.StorageClassName = &scName
+	err = reconciler.validateStorageDeviceSet(*sds)
+	assert.Contains(t, err.Error(), "no StorageClass specified")
+
+	sds.DataPVCTemplate.Spec.StorageClassName = nil
+	err = reconciler.validateStorageDeviceSet(*sds)
+	assert.Contains(t, err.Error(), "no StorageClass specified")
+}
+
 func TestStorageClusterInitConditions(t *testing.T) {
 	cc := &rookCephv1.CephCluster{}
 	mockCephCluster.DeepCopyInto(cc)
@@ -616,6 +657,10 @@ func createFakeScheme(t *testing.T) *runtime.Scheme {
 	err = corev1.AddToScheme(scheme)
 	if err != nil {
 		assert.Fail(t, "failed to add corev1 scheme")
+	}
+	err = storagev1.AddToScheme(scheme)
+	if err != nil {
+		assert.Fail(t, "failed to add storagev1 scheme")
 	}
 	err = rookCephv1.AddToScheme(scheme)
 	if err != nil {

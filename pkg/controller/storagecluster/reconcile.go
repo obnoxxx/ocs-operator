@@ -623,6 +623,16 @@ func (r *ReconcileStorageCluster) ensureCephConfig(sc *ocsv1.StorageCluster, req
 	return nil
 }
 
+// validateDeviceSet
+// validates the provided DeviceSet for completenes and correctness
+func (r *ReconcileStorageCluster) validateStorageDeviceSet(ds ocsv1.StorageDeviceSet) error {
+	if ds.DataPVCTemplate.Spec.StorageClassName == nil || *ds.DataPVCTemplate.Spec.StorageClassName == "" {
+		return fmt.Errorf("Failed to validate StorageDeviceSet: no StorageClass specified.")
+	}
+
+	return nil
+}
+
 // ensureCephCluster ensures that a CephCluster resource exists with its Spec in
 // the desired state.
 func (r *ReconcileStorageCluster) ensureCephCluster(sc *ocsv1.StorageCluster, reqLogger logr.Logger) error {
@@ -630,8 +640,9 @@ func (r *ReconcileStorageCluster) ensureCephCluster(sc *ocsv1.StorageCluster, re
 	// this is for performance optimization of slow device class
 	//TODO: If for a StorageDeviceSet there is a separate metadata pvc template, check for StorageClass of data pvc template only
 	for i, ds := range sc.Spec.StorageDeviceSets {
-		if ds.DataPVCTemplate.Spec.StorageClassName == nil || *ds.DataPVCTemplate.Spec.StorageClassName == "" {
-			return false, fmt.Errorf("no StorageClass specified")
+		err := r.validateStorageDeviceSet(ds)
+		if err != nil {
+			return err
 		}
 		throttle, err := r.throttleStorageDevices(*ds.DataPVCTemplate.Spec.StorageClassName)
 		if err != nil {

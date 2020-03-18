@@ -626,9 +626,6 @@ func (r *ReconcileStorageCluster) ensureCephConfig(sc *ocsv1.StorageCluster, req
 // ensureCephCluster ensures that a CephCluster resource exists with its Spec in
 // the desired state.
 func (r *ReconcileStorageCluster) ensureCephCluster(sc *ocsv1.StorageCluster, reqLogger logr.Logger) error {
-	// if StorageClass is "gp2" or "io1" based, set tuneSlowDeviceClass to true
-	// this is for performance optimization of slow device class
-	//TODO: If for a StorageDeviceSet there is a separate metadata pvc template, check for StorageClass of data pvc template only
 	for i, ds := range sc.Spec.StorageDeviceSets {
 		throttle, err := r.throttleStorageDevices(*ds.DataPVCTemplate.Spec.StorageClassName)
 		if err != nil {
@@ -917,6 +914,9 @@ func newStorageClassDeviceSets(sc *ocsv1.StorageCluster) []rook.StorageClassDevi
 	return storageClassDeviceSets
 }
 
+// if StorageClass is "gp2" or "io1" based, set tuneSlowDeviceClass to true
+// this is for performance optimization of slow device class
+//TODO: If for a StorageDeviceSet there is a separate metadata pvc template, check for StorageClass of data pvc template only
 func (r *ReconcileStorageCluster) throttleStorageDevices(storageClassName string) (bool, error) {
 	storageClass := &storagev1.StorageClass{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{Namespace: "", Name: storageClassName}, storageClass)

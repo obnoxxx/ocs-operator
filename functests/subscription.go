@@ -1,4 +1,4 @@
-package deploymanager
+package functests
 
 import (
 	"context"

@@ -6,13 +6,13 @@ import (
 	"log"
 	"os"
 
-	deploymanager "github.com/openshift/ocs-operator/pkg/deploy-manager"
+	deploymanager "github.com/openshift/ocs-operator/functests"
 )
 
 var (
-	ocsRegistryImage          = flag.String("ocs-registry-image", "", "The ocs-registry container image to use in the deployment")
-	ocsSubscriptionChannel    = flag.String("ocs-subscription-channel", "", "The subscription channel to receive upgades from in the deployment")
-	yamlOutputPath            = flag.String("yaml-output-path", "", "Just generate the yaml for the OCS olm deployment and dump it to a file")
+	ocsRegistryImage       = flag.String("ocs-registry-image", "", "The ocs-registry container image to use in the deployment")
+	ocsSubscriptionChannel = flag.String("ocs-subscription-channel", "", "The subscription channel to receive upgades from in the deployment")
+	yamlOutputPath         = flag.String("yaml-output-path", "", "Just generate the yaml for the OCS olm deployment and dump it to a file")
 )
 
 func main() {

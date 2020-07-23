@@ -1,12 +1,9 @@
-package functests_test
+package functests
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	tests "github.com/openshift/ocs-operator/functests"
-
-	deploymanager "github.com/openshift/ocs-operator/pkg/deploy-manager"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,7 +16,7 @@ var _ = Describe("PVC Creation", func() {
 	BeforeEach(func() {
 		RegisterFailHandler(Fail)
 
-		deployManager, err := deploymanager.NewDeployManager()
+		deployManager, err := NewDeployManager()
 		Expect(err).To(BeNil())
 		k8sClient = deployManager.GetK8sClient()
 	})
@@ -29,8 +26,8 @@ var _ = Describe("PVC Creation", func() {
 		var namespace string
 
 		BeforeEach(func() {
-			namespace = tests.TestNamespace
-			pvc = tests.GetRandomPVC(tests.StorageClassRBD, "1Gi")
+			namespace = TestNamespace
+			pvc = GetRandomPVC(StorageClassRBD, "1Gi")
 
 		})
 
@@ -48,7 +45,7 @@ var _ = Describe("PVC Creation", func() {
 				Expect(err).To(BeNil())
 
 				By("Verifying PVC reaches BOUND phase")
-				tests.WaitForPVCBound(k8sClient, pvc.Name, namespace)
+				WaitForPVCBound(k8sClient, pvc.Name, namespace)
 
 				By("Deleting PVC")
 				err = k8sClient.CoreV1().PersistentVolumeClaims(namespace).Delete(pvc.Name, &metav1.DeleteOptions{})

@@ -6,14 +6,13 @@ import (
 	"os/exec"
 
 	"github.com/onsi/gomega"
-	deploymanager "github.com/openshift/ocs-operator/pkg/deploy-manager"
 )
 
 // BeforeTestSuiteSetup is the function called to initialize the test environment
 func BeforeTestSuiteSetup() {
 	flag.Parse()
 
-	t, err := deploymanager.NewDeployManager()
+	t, err := NewDeployManager()
 	gomega.Expect(err).To(gomega.BeNil())
 
 	err = t.CreateNamespace(TestNamespace)
@@ -29,7 +28,7 @@ func BeforeTestSuiteSetup() {
 // AfterTestSuiteCleanup is the function called to tear down the test environment
 func AfterTestSuiteCleanup() {
 	flag.Parse()
-	t, err := deploymanager.NewDeployManager()
+	t, err := NewDeployManager()
 	gomega.Expect(err).To(gomega.BeNil())
 
 	// collect debug log before deleting namespace & cluster
@@ -50,7 +49,7 @@ func AfterTestSuiteCleanup() {
 // AfterUpgradeTestSuiteCleanup is the function called to tear down the test environment after upgrade failure
 func AfterUpgradeTestSuiteCleanup() {
 	flag.Parse()
-	t, err := deploymanager.NewDeployManager()
+	t, err := NewDeployManager()
 	gomega.Expect(err).To(gomega.BeNil())
 
 	err = t.DeleteNamespaceAndWait(TestNamespace)
@@ -65,7 +64,7 @@ func AfterUpgradeTestSuiteCleanup() {
 func BeforeUpgradeTestSuiteSetup() {
 	flag.Parse()
 
-	t, err := deploymanager.NewDeployManager()
+	t, err := NewDeployManager()
 	gomega.Expect(err).To(gomega.BeNil())
 
 	err = t.CreateNamespace(TestNamespace)

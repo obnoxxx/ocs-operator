@@ -1,4 +1,4 @@
-package deploymanager
+package functests
 
 import (
 	"fmt"
@@ -15,18 +15,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	crclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
-
-// InstallNamespace is the namespace ocs is installed into
-const InstallNamespace = "openshift-storage"
-
-// DefaultStorageClusterName is the name of the storage cluster the test suite installs
-const DefaultStorageClusterName = "test-storagecluster"
-
-// DefaultStorageClassRBD is the name of the ceph rbd storage class the test suite installs
-const DefaultStorageClassRBD = DefaultStorageClusterName + "-ceph-rbd"
-
-// MinOSDsCount represents the minimum number of OSDs required for this testsuite to run.
-const MinOSDsCount = 3
 
 func init() {
 	ocsv1.SchemeBuilder.AddToScheme(scheme.Scheme)

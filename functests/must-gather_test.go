@@ -1,4 +1,4 @@
-package functests_test
+package functests
 
 import (
 	"fmt"

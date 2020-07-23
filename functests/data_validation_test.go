@@ -1,11 +1,9 @@
-package functests_test
+package functests
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	tests "github.com/openshift/ocs-operator/functests"
-	deploymanager "github.com/openshift/ocs-operator/pkg/deploy-manager"
 	k8sbatchv1 "k8s.io/api/batch/v1"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -19,9 +17,8 @@ var _ = Describe("job creation", func() {
 	BeforeEach(func() {
 		RegisterFailHandler(Fail)
 
-		deployManager, err := deploymanager.NewDeployManager()
+		deployManager, err := NewDeployManager()
 		Expect(err).To(BeNil())
-
 		k8sClient = deployManager.GetK8sClient()
 	})
 
@@ -31,9 +28,9 @@ var _ = Describe("job creation", func() {
 		var job *k8sbatchv1.Job
 
 		BeforeEach(func() {
-			namespace = tests.TestNamespace
-			pvc = tests.GetRandomPVC(tests.StorageClassRBD, "1Gi")
-			job = tests.GetDataValidatorJob(pvc.GetName())
+			namespace = TestNamespace
+			pvc = GetRandomPVC(StorageClassRBD, "1Gi")
+			job = GetDataValidatorJob(pvc.GetName())
 		})
 
 		AfterEach(func() {
@@ -53,14 +50,14 @@ var _ = Describe("job creation", func() {
 				Expect(err).To(BeNil())
 
 				By("Verifying PVC reaches BOUND phase")
-				tests.WaitForPVCBound(k8sClient, pvc.Name, namespace)
+				WaitForPVCBound(k8sClient, pvc.Name, namespace)
 
 				By("Creating job")
 				_, err = k8sClient.BatchV1().Jobs(namespace).Create(job)
 				Expect(err).To(BeNil())
 
 				By("Verifying job succeeds in data validation")
-				tests.WaitForJobSucceeded(k8sClient, job.GetName(), namespace)
+				WaitForJobSucceeded(k8sClient, job.GetName(), namespace)
 
 				finalJob, err := k8sClient.BatchV1().Jobs(namespace).Get(job.GetName(), metav1.GetOptions{})
 				Expect(err).To(BeNil())

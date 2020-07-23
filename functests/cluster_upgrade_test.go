@@ -1,14 +1,10 @@
-package functests_test
+package functests
 
 import (
 	"flag"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	tests "github.com/openshift/ocs-operator/functests"
-
-	deploymanager "github.com/openshift/ocs-operator/pkg/deploy-manager"
 )
 
 var _ = PDescribe("Cluster upgrade", func() {
@@ -16,7 +12,7 @@ var _ = PDescribe("Cluster upgrade", func() {
 
 	BeforeEach(func() {
 		RegisterFailHandler(Fail)
-		if tests.UpgradeFromOcsRegistryImage == "" {
+		if UpgradeFromOcsRegistryImage == "" {
 			Skip("Condition not met for upgrade. Missing ocs registry image to upgrade from.")
 		}
 	})
@@ -25,23 +21,23 @@ var _ = PDescribe("Cluster upgrade", func() {
 
 		BeforeEach(func() {
 			By("Preparing for upgrade. Uninstall the current cluster")
-			tests.AfterTestSuiteCleanup()
+			AfterTestSuiteCleanup()
 			By("Reinstall a fresh cluster based on upgrade_from image")
-			tests.BeforeUpgradeTestSuiteSetup()
+			BeforeUpgradeTestSuiteSetup()
 		})
 
 		AfterEach(func() {
 			if CurrentGinkgoTestDescription().Failed {
 				By("Detected upgrade failure. Cleanup the cluster")
-				tests.AfterUpgradeTestSuiteCleanup()
+				AfterUpgradeTestSuiteCleanup()
 				By("Reinstall a fresh cluster")
-				tests.BeforeTestSuiteSetup()
+				BeforeTestSuiteSetup()
 			}
 		})
 
 		Context("upgrade cluster", func() {
 			It("and verify deployment status", func() {
-				deployManager, err := deploymanager.NewDeployManager()
+				deployManager, err := NewDeployManager()
 				Expect(err).To(BeNil())
 
 				By("Getting the current csv before the upgrade")
@@ -49,11 +45,11 @@ var _ = PDescribe("Cluster upgrade", func() {
 				Expect(err).To(BeNil())
 
 				By("Upgrading OCS with OLM to the current version from upgrade_from version")
-				err = deployManager.UpgradeOCSWithOLM(tests.OcsRegistryImage, tests.OcsSubscriptionChannel)
+				err = deployManager.UpgradeOCSWithOLM(OcsRegistryImage, OcsSubscriptionChannel)
 				Expect(err).To(BeNil())
 
 				By("Waiting for OCS CSV to be posted and installed")
-				err = deployManager.WaitForCsvUpgrade(csv.Name, tests.OcsSubscriptionChannel)
+				err = deployManager.WaitForCsvUpgrade(csv.Name, OcsSubscriptionChannel)
 				Expect(err).To(BeNil())
 
 				By("Waiting for ocs-operator, rook-ceph-operator and noobaa-operator to come online.")

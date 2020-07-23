@@ -1,4 +1,4 @@
-package functests_test
+package functests
 
 import (
 	"context"
@@ -11,9 +11,9 @@ import (
 	ocsv1 "github.com/openshift/ocs-operator/pkg/apis/ocs/v1"
 	scController "github.com/openshift/ocs-operator/pkg/controller/storagecluster"
 
-	deploymanager "github.com/openshift/ocs-operator/pkg/deploy-manager"
 	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/types"
+
 	//"k8s.io/apimachinery/pkg/api/errors"
 	cephv1 "github.com/rook/rook/pkg/apis/ceph.rook.io/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -48,11 +48,11 @@ var _ = Describe("StorageClusterInitialization", func() {
 
 		uidMap = make(map[types.UID]string)
 
-		defaultStorageCluster, err := deploymanager.DefaultStorageCluster()
+		defaultStorageCluster, err := DefaultStorageCluster()
 		name = defaultStorageCluster.Name
 		namespace = defaultStorageCluster.Namespace
 
-		deployManager, err := deploymanager.NewDeployManager()
+		deployManager, err := NewDeployManager()
 		Expect(err).To(BeNil())
 
 		ocsClient = deployManager.GetOcsClient()

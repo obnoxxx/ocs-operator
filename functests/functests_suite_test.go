@@ -1,12 +1,10 @@
-package functests_test
+package functests
 
 import (
 	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	tests "github.com/openshift/ocs-operator/functests"
 )
 
 func TestTests(t *testing.T) {
@@ -15,9 +13,9 @@ func TestTests(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	tests.BeforeTestSuiteSetup()
+	BeforeTestSuiteSetup()
 })
 
 var _ = AfterSuite(func() {
-	tests.AfterTestSuiteCleanup()
+	AfterTestSuiteCleanup()
 })

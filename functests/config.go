@@ -2,18 +2,28 @@ package functests
 
 import (
 	"flag"
-
-	deploymanager "github.com/openshift/ocs-operator/pkg/deploy-manager"
 )
+
+// InstallNamespace is the namespace ocs is installed into
+const InstallNamespace = "openshift-storage"
+
+// DefaultStorageClusterName is the name of the storage cluster the test suite installs
+const DefaultStorageClusterName = "test-storagecluster"
+
+// DefaultStorageClassRBD is the name of the ceph rbd storage class the test suite installs
+const DefaultStorageClassRBD = DefaultStorageClusterName + "-ceph-rbd"
+
+// MinOSDsCount represents the minimum number of OSDs required for this testsuite to run.
+const MinOSDsCount = 3
 
 // TestNamespace is the namespace we run all the tests in.
 const TestNamespace = "ocs-functest"
 
 // TestStorageCluster is the name of the storage cluster the test suite installs
-const TestStorageCluster = deploymanager.DefaultStorageClusterName
+const TestStorageCluster = DefaultStorageClusterName
 
 // StorageClassRBD is the name of the ceph rbd storage class the test suite installs
-const StorageClassRBD = deploymanager.DefaultStorageClassRBD
+const StorageClassRBD = DefaultStorageClassRBD
 
 // OcsSubscriptionChannel is the name of the ocs subscription channel
 var OcsSubscriptionChannel string

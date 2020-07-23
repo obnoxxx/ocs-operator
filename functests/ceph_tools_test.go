@@ -1,4 +1,4 @@
-package functests_test
+package functests
 
 import (
 	"fmt"
@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	ocsv1 "github.com/openshift/ocs-operator/pkg/apis/ocs/v1"
-	deploymanager "github.com/openshift/ocs-operator/pkg/deploy-manager"
 	k8sv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -28,7 +27,7 @@ var _ = Describe("Rook Ceph Tools", func() {
 	BeforeEach(func() {
 		RegisterFailHandler(Fail)
 
-		deployManager, err := deploymanager.NewDeployManager()
+		deployManager, err := NewDeployManager()
 		Expect(err).To(BeNil())
 		k8sClient = deployManager.GetK8sClient()
 		ocsClient = deployManager.GetOcsClient()
@@ -40,7 +39,7 @@ var _ = Describe("Rook Ceph Tools", func() {
 		init := &ocsv1.OCSInitialization{}
 		err := ocsClient.Patch(types.JSONPatchType).
 			Resource("ocsinitializations").
-			Namespace(deploymanager.InstallNamespace).
+			Namespace(InstallNamespace).
 			Name("ocsinit").
 			Body([]byte(patch)).
 			VersionedParams(&metav1.GetOptions{}, parameterCodec).
@@ -62,7 +61,7 @@ var _ = Describe("Rook Ceph Tools", func() {
 
 			By("Ensuring tools are created")
 			Eventually(func() error {
-				pods, err := k8sClient.CoreV1().Pods(deploymanager.InstallNamespace).List(metav1.ListOptions{LabelSelector: "app=rook-ceph-tools"})
+				pods, err := k8sClient.CoreV1().Pods(InstallNamespace).List(metav1.ListOptions{LabelSelector: "app=rook-ceph-tools"})
 				if err != nil {
 					return err
 				}
@@ -83,7 +82,7 @@ var _ = Describe("Rook Ceph Tools", func() {
 
 			By("Ensuring tools are removed")
 			Eventually(func() error {
-				pods, err := k8sClient.CoreV1().Pods(deploymanager.InstallNamespace).List(metav1.ListOptions{LabelSelector: "app=rook-ceph-tools"})
+				pods, err := k8sClient.CoreV1().Pods(InstallNamespace).List(metav1.ListOptions{LabelSelector: "app=rook-ceph-tools"})
 				if err != nil {
 					return err
 				}

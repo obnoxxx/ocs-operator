@@ -311,11 +311,12 @@ func TestThrottleStorageDevices(t *testing.T) {
 							StorageClassName: &fakestorageClassName,
 						},
 					},
-					Portable: true,
+					Portable:   true,
+					DeviceType: "hdd",
 				},
 			},
 			storageCluster: &api.StorageCluster{},
-			expectedSpeed:  diskSpeedUnknown,
+			expectedSpeed:  diskSpeedSlow,
 		},
 		{
 			label: "Case 3", // storageclass is managed-premium

@@ -55,3 +55,18 @@ func avoidObjectStore(p configv1.PlatformType) bool {
 	}
 	return false
 }
+
+// AvoidObjectStore determines whether an object store should be created
+// for the platform.
+func (r *ReconcileStorageCluster) AvoidObjectStore() (bool, configv1.PlatformType, error) {
+	platform, err := r.platform.GetPlatform(r.client)
+	if err != nil {
+		return false, "", err
+	}
+
+	if avoidObjectStore(platform) {
+		return true, platform, nil
+	}
+
+	return false, platform, nil
+}

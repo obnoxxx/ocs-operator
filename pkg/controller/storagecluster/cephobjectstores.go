@@ -21,11 +21,12 @@ func (r *ReconcileStorageCluster) ensureCephObjectStores(instance *ocsv1.Storage
 	if reconcileStrategy == ReconcileStrategyIgnore {
 		return nil
 	}
-	platform, err := r.platform.GetPlatform(r.client)
+
+	avoid, platform, err := r.AvoidObjectStore()
 	if err != nil {
 		return err
 	}
-	if avoidObjectStore(platform) {
+	if avoid {
 		reqLogger.Info(fmt.Sprintf("not creating a CephObjectStore because the platform is '%s'", platform))
 		return nil
 	}

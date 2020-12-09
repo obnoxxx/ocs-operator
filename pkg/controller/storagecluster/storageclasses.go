@@ -46,11 +46,11 @@ func (r *ReconcileStorageCluster) createStorageClasses(scs []*storagev1.StorageC
 		}
 
 		if index == cephObjectStoreIndex {
-			platform, err := r.platform.GetPlatform(r.client)
+			avoid, platform, err := r.AvoidObjectStore()
 			if err != nil {
 				return err
 			}
-			if avoidObjectStore(platform) {
+			if avoid {
 				reqLogger.Info(fmt.Sprintf("not creating a OBC storage class because the platform is '%s'", platform))
 				continue
 			}

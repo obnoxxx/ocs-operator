@@ -44,11 +44,11 @@ func (r *ReconcileStorageCluster) ensureCephObjectStoreUsers(instance *ocsv1.Sto
 	if reconcileStrategy == ReconcileStrategyIgnore {
 		return nil
 	}
-	platform, err := r.platform.GetPlatform(r.client)
+	avoid, _, err := r.AvoidObjectStore()
 	if err != nil {
 		return err
 	}
-	if avoidObjectStore(platform) {
+	if avoid {
 		return nil
 	}
 
